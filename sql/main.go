@@ -39,7 +39,22 @@ func main() {
     }
     pk := insertProduct(db, product)
 
-    fmt.Printf("ID = %d\n", pk)
+    var name string
+    var price string
+    var available bool
+
+    query := `SELECT name, price, available FROM product WHERE id = $1`
+    err = db.QueryRow(query, pk).Scan(&name, &price, &available)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            log.Fatalf("No rows were found with id %d", pk)
+        }
+        log.Fatal(err)
+    }
+
+    fmt.Printf("Name: %s\n", name)
+    fmt.Printf("Name: %v\n", price)
+    fmt.Printf("Name: %t\n", available)
 }
 
 func createProductTable(db *sql.DB) {
