@@ -1,3 +1,3 @@
 module github.com/agent-e11/htmx_go
 
-go 1.21.6
+go 1.21
