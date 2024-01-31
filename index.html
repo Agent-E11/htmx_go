@@ -19,9 +19,11 @@
 
             <ul id="film-list" class="list-group fs-5 me-5">
                 {{ range .Films }}
-                <li class="list-group-item bg-primary text-white">
-                    {{ .Title }} - {{ .Director }}
-                </li>
+                    {{ block "film-list-element" . }}
+                        <li class="list-group-item bg-primary text-white">
+                            {{ .Title }} - {{ .Director }}
+                        </li>
+                    {{ end }}
                 {{ end }}
             </ul>
         </div>
