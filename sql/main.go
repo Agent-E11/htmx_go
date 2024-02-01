@@ -1,4 +1,4 @@
-package main
+package sql
 
 import (
 	"database/sql"
@@ -43,7 +43,7 @@ func main() {
 
     log.Print("Connected to database...")
 
-    createProductTable(db)
+    CreateProductTable(db)
 
     data := []Product{}
     rows, err := db.Query("SELECT name, price, available FROM product")
@@ -67,14 +67,14 @@ func main() {
 
     fmt.Println(data)
 
-    //p := Product{ "Book", 15.55, true }
+    p := Product{ "Book", 15.55, true }
 
-    //pk := insertProduct(db, p)
+    pk := InsertProduct(db, p)
 
-    //fmt.Println("ID =", pk)
+    fmt.Println("ID =", pk)
 }
 
-func createProductTable(db *sql.DB) {
+func CreateProductTable(db *sql.DB) {
     query := `CREATE TABLE IF NOT EXISTS product (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
@@ -89,7 +89,7 @@ func createProductTable(db *sql.DB) {
     }
 }
 
-func insertProduct(db *sql.DB, product Product) int {
+func InsertProduct(db *sql.DB, product Product) int {
     query := `INSERT INTO product (name, price, available)
         VALUES ($1, $2, $3) RETURNING id`
 

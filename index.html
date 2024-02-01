@@ -18,10 +18,13 @@
             <h1 class="mb-4">Film List</h1>
 
             <ul id="film-list" class="list-group fs-5 me-5">
-                {{ range .Films }}
+                {{ range .Products }}
                     {{ block "film-list-element" . }}
                         <li class="list-group-item bg-primary text-white">
-                            {{ .Title }} - {{ .Director }}
+                            {{ .Name }}: ${{ .Price }}
+                            {{ if .Available }}
+                                <p>Available</p>
+                            {{ end }}
                         </li>
                     {{ end }}
                 {{ end }}
@@ -36,12 +39,16 @@
                 hx-swap="beforeend"
                 hx-indicator="#spinner">
                 <div class="mb-4">
-                    <label for="film-title">Title</label>
-                    <input type="text" name="title" id="film-title" class="form-control" />
+                    <label for="product-name">Name</label>
+                    <input type="text" name="name" id="product-name" class="form-control" />
                 </div>
                 <div class="mb-3">
-                    <label for="film-director">Director</label>
-                    <input type="text" name="director" id="film-director" class="form-control" />
+                    <label for="product-price">Price</label>
+                    <input type="number" name="price" id="product-price" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="product-available">Product is available:</label>
+                    <input type="checkbox" name="available" id="product-available" class="" <!-- Add a bootstrap class? --> checked />
                 </div>
 
                 <button type="submit" class="btn btn-primary">
