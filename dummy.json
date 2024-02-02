@@ -1,0 +1,27 @@
+[
+    {
+        "Name": "Book",
+        "Price": 15.55,
+        "Available": true
+    },
+    {
+        "Name": "TV",
+        "Price": 199.99,
+        "Available": false
+    },
+    {
+        "Name": "Mouse",
+        "Price": 9.99,
+        "Available": true
+    },
+    {
+        "Name": "Keyboard",
+        "Price": 12.99,
+        "Available": false
+    },
+    {
+        "Name": "Moniter",
+        "Price": 79.99,
+        "Available": true
+    }
+]
