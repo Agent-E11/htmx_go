@@ -13,18 +13,15 @@
     <title>htmx tutorial</title>
 </head>
 <body>
-    <div class="row mt-4 g-4">
+    <div class="row m-4 g-4">
         <div class="col-8">
             <h1 class="mb-4">Film List</h1>
 
             <ul id="film-list" class="list-group fs-5 me-5">
                 {{ range .Products }}
                     {{ block "film-list-element" . }}
-                        <li class="list-group-item bg-primary text-white">
+                    <li class="list-group-item {{ if .Available }}bg-primary{{ else }}bg-danger{{ end }} text-white ">
                             {{ .Name }}: ${{ .Price }}
-                            {{ if .Available }}
-                                <p>Available</p>
-                            {{ end }}
                         </li>
                     {{ end }}
                 {{ end }}
