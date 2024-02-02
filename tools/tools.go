@@ -46,10 +46,10 @@ func ConnectDatabase() (*sql.DB, error) {
 }
 
 // Load data from file (encoded as json) into database
-func LoadDummyData(db *sql.DB, filename string) error {
+func LoadDummyData(db *sql.DB, filename string) ([]mySql.Product, error) {
     bytes, err := os.ReadFile(filename)
     if err != nil {
-        return err
+        return nil, err
     }
 
     productJson := string(bytes)
@@ -58,12 +58,12 @@ func LoadDummyData(db *sql.DB, filename string) error {
 
     err = json.Unmarshal([]byte(productJson), &products)
     if err != nil {
-        return err
+        return nil, err
     }
 
     for _, p := range products {
         mySql.InsertProduct(db, p)
     }
 
-    return nil
+    return products, nil
 }

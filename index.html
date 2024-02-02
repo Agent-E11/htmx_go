@@ -45,7 +45,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="product-available">Product is available:</label>
-                    <input type="checkbox" name="available" id="product-available" class="" <!-- Add a bootstrap class? --> checked />
+                    <input type="checkbox" name="available" id="product-available" class="" checked /> <!-- Add a bootstrap class? -->
                 </div>
 
                 <button type="submit" class="btn btn-primary">
@@ -54,6 +54,12 @@
                 </button>
             </form>
         </div>
+        <button class="btn btn-primary col-2"
+            hx-post="/load-dummy-data/"
+            hx-target="#film-list"
+            hx-swap="beforeend">
+            Load dummy data
+        </button>
     </div>
 </body>
 </html>
