@@ -16,16 +16,21 @@ import (
 // Uses the following environment variables:
 //
 // - POSTGRES_PASSWORD : Required
+// - POSTGRES_HOSTNAME : Not required (defaults to localhost)
 // - POSTGRES_PORT : Not required (defaults to 5432)
 // - POSTGRES_DBNAME : Required
 func ConnectDatabase() (*sql.DB, error) {
     // Get variables from environment, handle errors
     password := os.Getenv("POSTGRES_PASSWORD")
+    hostname := os.Getenv("POSTGRES_HOSTNAME")
     port := os.Getenv("POSTGRES_PORT")
     dbName := os.Getenv("POSTGRES_DBNAME")
     if password == "" {
         log.Println("Error reading POSTGRES_PASSWORD")
         return nil, errors.New("Error reading POSTGRES_PASSWORD")
+    }
+    if hostname == "" {
+        hostname = "localhost"
     }
     if port != "5432" && port != "" {
         log.Println("Different port numbers are unsupported at this time. Use port 5432")
@@ -39,7 +44,7 @@ func ConnectDatabase() (*sql.DB, error) {
     }
 
     // Construct connection string
-    connStr := fmt.Sprintf("postgres://postgres:%s@db:%s/%s?sslmode=disable", password, port, dbName)
+    connStr := fmt.Sprintf("postgres://postgres:%s@%s:%s/%s?sslmode=disable", password, hostname, port, dbName)
     
     // Return the database connection and error
     return sql.Open("postgres", connStr)
