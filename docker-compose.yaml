@@ -1,5 +1,9 @@
 services:
-  pg-container:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+  db:
     ports:
       - "${POSTGRES_PORT}:5432"
     image: postgres
