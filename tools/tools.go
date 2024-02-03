@@ -39,7 +39,7 @@ func ConnectDatabase() (*sql.DB, error) {
     }
 
     // Construct connection string
-    connStr := fmt.Sprintf("postgres://postgres:%s@localhost:%s/%s?sslmode=disable", password, port, dbName)
+    connStr := fmt.Sprintf("postgres://postgres:%s@db:%s/%s?sslmode=disable", password, port, dbName)
     
     // Return the database connection and error
     return sql.Open("postgres", connStr)
