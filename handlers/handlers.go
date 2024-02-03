@@ -84,3 +84,22 @@ func AddProduct(w http.ResponseWriter, r *http.Request) {
         product,
     )
 }
+
+
+func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request) {
+    db, err := tools.ConnectDatabase()
+    defer db.Close()
+
+    if err != nil {
+        return
+    }
+    products, err := tools.LoadDummyData(db, "dummy.json")
+    tmpl := template.Must(template.ParseFiles("index.html"))
+    for _, p := range products {
+        tmpl.ExecuteTemplate(w,
+            "film-list-element",
+            p,
+        )
+    }
+}
+
