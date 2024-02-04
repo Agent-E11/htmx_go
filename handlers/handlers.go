@@ -44,7 +44,7 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         "Products": products,
     }
 
-    tmpl := template.Must(template.ParseFiles("index.html"))
+    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
     tmpl.Execute(w, data)
 }
 
@@ -79,7 +79,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     mySql.InsertProduct(db, product)
 
     // Return product as html fragment
-    tmpl := template.Must(template.ParseFiles("index.html"))
+    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
     tmpl.ExecuteTemplate(w,
         "film-list-element",
         product,
@@ -95,7 +95,7 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
         return
     }
     products, err := tools.LoadDummyData(db, "dummy.json")
-    tmpl := template.Must(template.ParseFiles("index.html"))
+    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
     for _, p := range products {
         tmpl.ExecuteTemplate(w,
             "film-list-element",
