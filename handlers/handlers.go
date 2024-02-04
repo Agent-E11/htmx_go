@@ -1,16 +1,17 @@
 package handlers
 
 import (
-    "net/http"
-    "strconv"
-    "log"
-    "text/template"
+	"log"
+	"net/http"
+	"strconv"
+	"text/template"
 
-    mySql "github.com/agent-e11/htmx_go/sql"
-    "github.com/agent-e11/htmx_go/tools"
+	mySql "github.com/agent-e11/htmx_go/sql"
+	"github.com/agent-e11/htmx_go/tools"
+	"github.com/julienschmidt/httprouter"
 )
 
-func HomePage(w http.ResponseWriter, r *http.Request) {
+func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     db, err := tools.ConnectDatabase()
     defer db.Close()
     if err != nil {
@@ -48,7 +49,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 }
 
 // Add a product to the database
-func AddProduct(w http.ResponseWriter, r *http.Request) {
+func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     // Connect to database
     db, err := tools.ConnectDatabase()
     defer db.Close()
@@ -86,7 +87,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request) {
+func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     db, err := tools.ConnectDatabase()
     defer db.Close()
 

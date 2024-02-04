@@ -85,7 +85,7 @@ func CreateProductTable(db *sql.DB) {
 
     _, err := db.Exec(query)
     if err != nil {
-        log.Fatal(err)
+        log.Fatalf("Error creating database table: %v\n", err)
     }
 }
 

@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 
+    "github.com/julienschmidt/httprouter"
+
 	"github.com/agent-e11/htmx_go/handlers"
 	mySql "github.com/agent-e11/htmx_go/sql"
 	"github.com/agent-e11/htmx_go/tools"
@@ -34,12 +36,14 @@ func main() {
     // HTTP Server
     log.Print("Running htmx server...")
 
-    http.HandleFunc("/", handlers.HomePage)
-    http.HandleFunc("/add-product/", handlers.AddProduct)
-    http.HandleFunc("/load-dummy-data/", handlers.LoadDummyDataHandler)
-    //http.HandleFunc("/delete-all-data/", deleteAllDataHandler)
+    router := httprouter.New()
 
-    log.Fatal(http.ListenAndServe(":8000", nil))
+    router.GET("/", handlers.HomePage)
+    router.POST("/add-product/", handlers.AddProduct)
+    router.POST("/load-dummy-data/", handlers.LoadDummyDataHandler)
+    //router.GET("/delete-all-data/", deleteAllDataHandler)
+
+    log.Fatal(http.ListenAndServe(":8000", router))
 }
 
 //func deleteAllDataHandler(w http.ResponseWriter, r *http.Request) {
