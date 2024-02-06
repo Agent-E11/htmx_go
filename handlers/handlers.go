@@ -63,10 +63,16 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     priceStr := r.PostFormValue("price")
     availableStr := r.PostFormValue("available")
 
+    if name == "" || priceStr == "" {
+        log.Println("Error: cannot parse empty fields")
+        return
+    }
+
     // Convert to data types
     price, err := strconv.ParseFloat(priceStr, 64)
     if err != nil {
-        log.Fatalf("Error parsing price: %v\n", err)
+        log.Printf("Error parsing price: %v\n", err)
+        return
     }
     available := availableStr != ""
 
