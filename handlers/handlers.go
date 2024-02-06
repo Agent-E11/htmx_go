@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -65,6 +66,9 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
     if name == "" || priceStr == "" {
         log.Println("Error: cannot parse empty fields")
+        w.Header().Add("HX-Retarget", "#form-error")
+        w.Header().Add("HX-Reswap", "innerHTML")
+        fmt.Fprint(w, "No form fields can be empty")
         return
     }
 
@@ -72,6 +76,9 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     price, err := strconv.ParseFloat(priceStr, 64)
     if err != nil {
         log.Printf("Error parsing price: %v\n", err)
+        w.Header().Add("HX-Retarget", "#form-error")
+        w.Header().Add("HX-Reswap", "innerHTML")
+        fmt.Fprintf(w, "`%s` is not a valid number", priceStr)
         return
     }
     available := availableStr != ""
@@ -91,7 +98,6 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         product,
     )
 }
-
 
 func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     db, err := tools.ConnectDatabase()
