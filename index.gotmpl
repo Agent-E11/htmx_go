@@ -17,22 +17,21 @@
         <div class="col-8">
             <h1 class="mb-4">Product List</h1>
 
-            <ul id="film-list" class="list-group fs-5 me-5">
-                {{ range .Products }}
-                    {{ block "film-list-element" . }}
-                    <li class="list-group-item {{ if .Available }}bg-primary{{ else }}bg-danger{{ end }} text-white ">
-                            {{ .Name }}: ${{ .Price }}
-                        </li>
-                    {{ end }}
-                {{ end }}
-            </ul>
+            <input class="form-control" type="search"
+                name="search" placeholder="Filter products..."
+                hx-post="/search-products"
+                hx-trigger="input changed delay:500ms, search, load"
+                hx-target="#product-list"
+                hx-swap="outerHTML">
+
+            <ul id="product-list" class="list-group fs-5 me-5"></ul>
         </div>
 
         <div class="col-4">
             <h1 class="mb-4">Add Product</h1>
 
             <form hx-post="/add-product/"
-                hx-target="#film-list"
+                hx-target="#product-list"
                 hx-swap="beforeend"
                 hx-indicator="#spinner">
                 <div class="mb-4">
@@ -57,7 +56,7 @@
         </div>
         <button class="btn btn-primary col-2"
             hx-post="/load-dummy-data/"
-            hx-target="#film-list"
+            hx-target="#product-list"
             hx-swap="beforeend">
             Load dummy data
         </button>

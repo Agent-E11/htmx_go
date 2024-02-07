@@ -13,6 +13,7 @@ import (
 )
 
 func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
     db, err := tools.ConnectDatabase()
     defer db.Close()
     if err != nil {
@@ -36,16 +37,62 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         err := rows.Scan(&name, &price, &available)
         if err != nil {
             log.Printf("Error converting row to product: %v\n", err)
+        } else {
+            products = append(products, mySql.Product{ Name: name, Price: price, Available: available })
         }
-        
-        products = append(products, mySql.Product{ Name: name, Price: price, Available: available })
     }
 
     data := map[string][]mySql.Product{
         "Products": products,
     }
 
-    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
+    tmpl.Execute(w, data)
+}
+
+func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+    tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
+    search := r.FormValue("search")
+
+    db, err := tools.ConnectDatabase()
+    if err != nil {
+        log.Printf("Error connecting to db: %v", err)
+        return
+    } else {
+        log.Print("Successfully connected to db")
+    }
+
+    var query string
+    if search == "" {
+        query = fmt.Sprintf("SELECT name, price, available FROM product")
+    } else {
+        query = fmt.Sprintf("SELECT name, price, available FROM product WHERE name='%s'", search)
+    }
+
+    rows, err := db.Query(query)
+    if err != nil {
+        log.Printf("Error fetching products with query `%s`: %v", query, err)
+        return
+    }
+    defer rows.Close()
+
+    products := []mySql.Product{}
+    var name string
+    var price float64
+    var available bool
+
+    for rows.Next() {
+        err := rows.Scan(&name, &price, &available)
+        if err != nil {
+            log.Printf("Error converting row to product: %v\n", err)
+        } else {
+            products = append(products, mySql.Product{ Name: name, Price: price, Available: available })
+        }
+    }
+
+    data := map[string][]mySql.Product{
+        "Products": products,
+    }
+
     tmpl.Execute(w, data)
 }
 
@@ -94,7 +141,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     // Return product as html fragment
     tmpl := template.Must(template.ParseFiles("index.gotmpl"))
     tmpl.ExecuteTemplate(w,
-        "film-list-element",
+        "product-list-element",
         product,
     )
 }
@@ -110,7 +157,7 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
     tmpl := template.Must(template.ParseFiles("index.gotmpl"))
     for _, p := range products {
         tmpl.ExecuteTemplate(w,
-            "film-list-element",
+            "product-list-element",
             p,
         )
     }

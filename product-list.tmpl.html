@@ -1,0 +1,9 @@
+<ul id="product-list" class="list-group fs-5 me-5">
+    {{ range .Products }}
+        {{ block "product-list-element" . }}
+        <li class="list-group-item bg-primary {{ if not .Available }}opacity-75{{ end }} text-white ">
+            {{ .Name }}: ${{ .Price }}
+        </li>
+        {{ end }}
+    {{ end }}
+</ul>

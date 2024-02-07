@@ -41,6 +41,7 @@ func main() {
     router.GET("/", handlers.HomePage)
     router.POST("/add-product/", handlers.AddProduct)
     router.POST("/load-dummy-data/", handlers.LoadDummyDataHandler)
+    router.POST("/search-products", handlers.SearchProducts)
     //router.GET("/delete-all-data/", deleteAllDataHandler)
 
     log.Fatal(http.ListenAndServe(":8000", router))
