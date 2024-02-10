@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"text/template"
 
 	mySql "github.com/agent-e11/htmx_go/sql"
@@ -13,7 +14,7 @@ import (
 )
 
 func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
+    tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
     db, err := tools.ConnectDatabase()
     defer db.Close()
     if err != nil {
@@ -51,7 +52,13 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
+
+    // Get search value
     search := r.FormValue("search")
+    // Escape characters and use `*` instead of `%`
+    search = strings.Replace(search, "%", "\\%", -1)
+    search = strings.Replace(search, "_", "\\_", -1)
+    search = strings.Replace(search, "*", "%", -1)
 
     db, err := tools.ConnectDatabase()
     if err != nil {
@@ -65,9 +72,10 @@ func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
     if search == "" {
         query = fmt.Sprintf("SELECT name, price, available FROM product")
     } else {
-        query = fmt.Sprintf("SELECT name, price, available FROM product WHERE name='%s'", search)
+        query = fmt.Sprintf("SELECT name, price, available FROM product WHERE name ILIKE '%s'", search)
     }
 
+    log.Printf("Querying the database: `%s`", query)
     rows, err := db.Query(query)
     if err != nil {
         log.Printf("Error fetching products with query `%s`: %v", query, err)
@@ -139,7 +147,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     mySql.InsertProduct(db, product)
 
     // Return product as html fragment
-    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
+    tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
     tmpl.ExecuteTemplate(w,
         "product-list-element",
         product,
@@ -154,7 +162,7 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
         return
     }
     products, err := tools.LoadDummyData(db, "dummy.json")
-    tmpl := template.Must(template.ParseFiles("index.gotmpl"))
+    tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
     for _, p := range products {
         tmpl.ExecuteTemplate(w,
             "product-list-element",
