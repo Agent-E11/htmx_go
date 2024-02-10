@@ -53,6 +53,13 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
 
+    db, err := tools.ConnectDatabase()
+    if err != nil {
+        log.Printf("Error connecting to db: %v", err)
+        return
+    }
+    log.Print("Successfully connected to db")
+
     // Get search value
     search := r.FormValue("search")
     // Escape characters and use `*` instead of `%`
@@ -60,37 +67,39 @@ func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
     search = strings.Replace(search, "_", "\\_", -1)
     search = strings.Replace(search, "*", "%", -1)
 
-    //search, queries := parseSearchQuery(search)
+    search, queries := parseSearchQuery(search) // FIXME: `queries` is a confusing name
 
-    db, err := tools.ConnectDatabase()
-    if err != nil {
-        log.Printf("Error connecting to db: %v", err)
-        return
-    } else {
-        log.Print("Successfully connected to db")
+    // Initialize the query, where_clause, and conditions
+    query := fmt.Sprintf("SELECT name, price, available FROM product")
+    where_clause := ""
+    conditions := []string{}
+
+    // Add a name condition if the search is not empty
+    if search != "" {
+        conditions = append(
+            conditions, 
+            fmt.Sprintf("name ILIKE '%s'", search),
+        )
     }
 
-    //log.Printf("Number of queries: %d", len(queries))
+    // If there are other queries, add them as conditions
+    if len(queries) > 0 {
+        // FIXME: If the column doesn't exist in the row, the whole program will crash
+        // How do I make it so that the program doesn't crash if there is an error?
+        // Can I do a check if the column is present?
+        for col, q := range queries {
+            c := fmt.Sprintf("%s::varchar ILIKE '%s'", col, q);
+            conditions = append(conditions, c)
+            log.Printf("Adding condition: %s", c)
+        }
+    }
 
-    query := fmt.Sprintf("SELECT name, price, available FROM product")
-//    if search == "" {
-//        // Do nothing
-//        log.Println("Doing nothing")
-//    } else if len(queries) == 0 {
-//        log.Println("Filtering on name")
-//        query += fmt.Sprintf(" WHERE name ILIKE '%s'", search)
-//    } else {
-//        log.Println("Filtering on other columns")
-//        conditions := []string{}
-//        for col, q := range queries {
-//            conditions = append(
-//                conditions,
-//                fmt.Sprintf("%s ILIKE '%s'", col, q),
-//            )
-//        }
-//        where_clause := " WHERE " + strings.Join(conditions, " AND ")
-//        query += where_clause
-//    }
+    // If there are conditions, build a where clause from them
+    if len(conditions) > 0 {
+        where_clause = " WHERE " + strings.Join(conditions, " AND ")
+    }
+    // Add the where clause to the query
+    query += where_clause
 
     log.Printf("Querying the database: `%s`", query)
     rows, err := db.Query(query)
@@ -189,6 +198,8 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
 }
 
 func parseSearchQuery(search string) (return_string string, queries map[string]string) {
+    // FIXME: By storing the queries in a map, it only allows one value for each key.
+    // It should probably be stored as a slice: `queries [2]string`
     queries = make(map[string]string)
     split := strings.Split(search, " ")
 
