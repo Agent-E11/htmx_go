@@ -60,6 +60,8 @@ func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
     search = strings.Replace(search, "_", "\\_", -1)
     search = strings.Replace(search, "*", "%", -1)
 
+    //search, queries := parseSearchQuery(search)
+
     db, err := tools.ConnectDatabase()
     if err != nil {
         log.Printf("Error connecting to db: %v", err)
@@ -68,12 +70,27 @@ func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
         log.Print("Successfully connected to db")
     }
 
-    var query string
-    if search == "" {
-        query = fmt.Sprintf("SELECT name, price, available FROM product")
-    } else {
-        query = fmt.Sprintf("SELECT name, price, available FROM product WHERE name ILIKE '%s'", search)
-    }
+    //log.Printf("Number of queries: %d", len(queries))
+
+    query := fmt.Sprintf("SELECT name, price, available FROM product")
+//    if search == "" {
+//        // Do nothing
+//        log.Println("Doing nothing")
+//    } else if len(queries) == 0 {
+//        log.Println("Filtering on name")
+//        query += fmt.Sprintf(" WHERE name ILIKE '%s'", search)
+//    } else {
+//        log.Println("Filtering on other columns")
+//        conditions := []string{}
+//        for col, q := range queries {
+//            conditions = append(
+//                conditions,
+//                fmt.Sprintf("%s ILIKE '%s'", col, q),
+//            )
+//        }
+//        where_clause := " WHERE " + strings.Join(conditions, " AND ")
+//        query += where_clause
+//    }
 
     log.Printf("Querying the database: `%s`", query)
     rows, err := db.Query(query)
@@ -171,3 +188,28 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
     }
 }
 
+func parseSearchQuery(search string) (return_string string, queries map[string]string) {
+    queries = make(map[string]string)
+    split := strings.Split(search, " ")
+
+    filtered := tools.Filter(split, func(s string) bool {
+        return !strings.Contains(s, ":")
+    })
+
+    return_string = strings.Join(filtered, " ")
+
+    query_strings := tools.Filter(split, func(s string) bool {
+        return strings.Contains(s, ":")
+    })
+
+    for _, s := range query_strings {
+        key_val := strings.SplitN(s, ":", 2)
+        queries[key_val[0]] = key_val[1]
+    }
+
+    log.Printf("Parsed search string: `%s`", search)
+    log.Printf("Return string: `%s`", return_string)
+    log.Printf("Queries: %v", queries)
+
+    return
+}

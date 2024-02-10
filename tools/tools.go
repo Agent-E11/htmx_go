@@ -72,3 +72,14 @@ func LoadDummyData(db *sql.DB, filename string) ([]mySql.Product, error) {
 
     return products, nil
 }
+
+func Filter[T any](slice []T, test func(T) bool) []T {
+    var ret []T
+    for _, s := range slice {
+        if test(s) {
+            ret = append(ret, s)
+        }
+    }
+
+    return ret
+}
