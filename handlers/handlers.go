@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"text/template"
@@ -13,6 +14,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+type TemplateData struct {
+    Products []mySql.Product
+    SearchString string
+}
+
 func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
     db, err := tools.ConnectDatabase()
@@ -21,6 +27,8 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         log.Println("Error connecting to database")
         return
     }
+
+    search_query := r.URL.Query().Get("q")
 
     products := []mySql.Product{}
     rows, err := db.Query("SELECT name, price, available FROM product")
@@ -34,6 +42,7 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     var price float64
     var available bool
 
+    // FIXME: I don't think that index.tmpl.html even uses Products, so this might be redundant
     for rows.Next() {
         err := rows.Scan(&name, &price, &available)
         if err != nil {
@@ -43,8 +52,13 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         }
     }
 
-    data := map[string][]mySql.Product{
-        "Products": products,
+    //data := map[string][]mySql.Product{
+    //    "Products": products,
+    //}
+
+    data := TemplateData{
+        Products: products,
+        SearchString: search_query,
     }
 
     tmpl.Execute(w, data)
@@ -62,6 +76,11 @@ func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 
     // Get search value
     search := r.FormValue("search")
+    if search != "" {
+        w.Header().Add("HX-Replace-URL", "?q=" + url.QueryEscape(search))
+    } else {
+        w.Header().Add("HX-Replace-URL", "")
+    }
     // Escape characters and use `*` instead of `%`
     search = strings.Replace(search, "%", "\\%", -1)
     search = strings.Replace(search, "_", "\\_", -1)
