@@ -79,8 +79,9 @@ func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
     if search != "" {
         w.Header().Add("HX-Replace-URL", "?q=" + url.QueryEscape(search))
     } else {
-        w.Header().Add("HX-Replace-URL", "")
+        w.Header().Add("HX-Replace-URL", "/")
     }
+
     // Escape characters and use `*` instead of `%`
     search = strings.Replace(search, "%", "\\%", -1)
     search = strings.Replace(search, "_", "\\_", -1)
