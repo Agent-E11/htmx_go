@@ -107,6 +107,9 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         // FIXME: If the column doesn't exist in the row, the whole program will crash
         // How do I make it so that the program doesn't crash if there is an error?
         // Can I do a check if the column is present?
+        // ..
+        // The reason that it "crashes", is because, when db.Query() panics,
+        // it returns a 200 response, and no data. So htmx deletes the product-list
         for col, q := range queries {
             c := fmt.Sprintf("%s::varchar ILIKE '%s'", col, q);
             conditions = append(conditions, c)
