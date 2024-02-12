@@ -20,7 +20,7 @@
             <input class="form-control" type="search"
                 name="search" placeholder="Filter products..."
                 value="{{ .SearchString }}"
-                hx-post="/search-products"
+                hx-post="/product-list"
                 hx-trigger="input changed delay:500ms, search, load"
                 hx-target="#product-list"
                 hx-swap="outerHTML">

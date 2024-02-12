@@ -64,7 +64,7 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl.Execute(w, data)
 }
 
-func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
 
     db, err := tools.ConnectDatabase()
@@ -143,11 +143,21 @@ func SearchProducts(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
         }
     }
 
-    data := map[string][]mySql.Product{
-        "Products": products,
-    }
+    if len(products) > 0 {
+        data := map[string][]mySql.Product{
+            "Products": products,
+        }
 
-    tmpl.Execute(w, data)
+        tmpl.Execute(w, data)
+    } else {
+        fmt.Fprint(w,
+            `<ul id="product-list">
+                <p class="mt-5 mx-auto" style="width: max-content">
+                    There are no products to display
+                </p>
+            </ul>`,
+        )
+    }
 }
 
 // Add a product to the database
