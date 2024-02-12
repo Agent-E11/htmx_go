@@ -111,8 +111,8 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
     // If there are other queries, add them as conditions
     if len(queries) > 0 {
-        for col, q := range queries {
-            c := fmt.Sprintf("%s::varchar ILIKE '%s'", col, q);
+        for _, col_val := range queries {
+            c := fmt.Sprintf("%s::varchar ILIKE '%s'", col_val[0], col_val[1]);
             conditions = append(conditions, c)
             log.Printf("Adding condition: %s", c)
         }
@@ -226,10 +226,8 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
     }
 }
 
-func parseSearchQuery(search string) (return_string string, queries map[string]string) {
-    // FIXME: By storing the queries in a map, it only allows one value for each key.
-    // It should probably be stored as a slice: `queries [2]string`
-    queries = make(map[string]string)
+func parseSearchQuery(search string) (return_string string, queries [][2]string) {
+    queries = make([][2]string, 0)
     split := strings.Split(search, " ")
 
     filtered := tools.Filter(split, func(s string) bool {
@@ -244,7 +242,10 @@ func parseSearchQuery(search string) (return_string string, queries map[string]s
 
     for _, s := range query_strings {
         key_val := strings.SplitN(s, ":", 2)
-        queries[key_val[0]] = key_val[1]
+        queries = append(
+            queries,
+            [2]string{key_val[0], key_val[1]},
+        )
     }
 
     log.Printf("Parsed search string: `%s`", search)
