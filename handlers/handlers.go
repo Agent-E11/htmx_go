@@ -21,43 +21,11 @@ type TemplateData struct {
 
 func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
-    db, err := tools.ConnectDatabase()
-    defer db.Close()
-    if err != nil {
-        log.Println("Error connecting to database")
-        return
-    }
 
     search_query := r.URL.Query().Get("q")
 
-    products := []mySql.Product{}
-    rows, err := db.Query("SELECT name, price, available FROM product")
-    if err != nil {
-        log.Println("Error fetching products")
-        return
-    }
-    defer rows.Close()
-
-    var name string
-    var price float64
-    var available bool
-
-    // FIXME: I don't think that index.tmpl.html even uses Products, so this might be redundant
-    for rows.Next() {
-        err := rows.Scan(&name, &price, &available)
-        if err != nil {
-            log.Printf("Error converting row to product: %v\n", err)
-        } else {
-            products = append(products, mySql.Product{ Name: name, Price: price, Available: available })
-        }
-    }
-
-    //data := map[string][]mySql.Product{
-    //    "Products": products,
-    //}
-
     data := TemplateData{
-        Products: products,
+        Products: nil,
         SearchString: search_query,
     }
 
