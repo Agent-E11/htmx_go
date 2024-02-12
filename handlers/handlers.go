@@ -67,6 +67,13 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
 
+    no_products_html :=
+        `<div id="product-list">
+            <p class="mt-5 mx-auto" style="width: max-content">
+                There are no products to display
+            </p>
+        </div>`
+
     db, err := tools.ConnectDatabase()
     if err != nil {
         log.Printf("Error connecting to db: %v", err)
@@ -104,12 +111,6 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
     // If there are other queries, add them as conditions
     if len(queries) > 0 {
-        // FIXME: If the column doesn't exist in the row, the whole program will crash
-        // How do I make it so that the program doesn't crash if there is an error?
-        // Can I do a check if the column is present?
-        // ..
-        // The reason that it "crashes", is because, when db.Query() panics,
-        // it returns a 200 response, and no data. So htmx deletes the product-list
         for col, q := range queries {
             c := fmt.Sprintf("%s::varchar ILIKE '%s'", col, q);
             conditions = append(conditions, c)
@@ -128,6 +129,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     rows, err := db.Query(query)
     if err != nil {
         log.Printf("Error fetching products with query `%s`: %v", query, err)
+        fmt.Fprint(w, no_products_html)
         return
     }
     defer rows.Close()
@@ -153,13 +155,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
         tmpl.Execute(w, data)
     } else {
-        fmt.Fprint(w,
-            `<ul id="product-list">
-                <p class="mt-5 mx-auto" style="width: max-content">
-                    There are no products to display
-                </p>
-            </ul>`,
-        )
+        fmt.Fprint(w, no_products_html)
     }
 }
 
