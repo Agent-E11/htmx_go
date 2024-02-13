@@ -1,4 +1,4 @@
-package sql
+package dbcontrol
 
 import (
 	"database/sql"
@@ -16,6 +16,7 @@ type Product struct {
     Available bool
 }
 
+// FIXME: Remove this entire function
 func main() {
     password := os.Getenv("POSTGRES_PASSWORD")
     port := os.Getenv("POSTGRES_PORT")

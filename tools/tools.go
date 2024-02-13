@@ -7,7 +7,7 @@ import (
     "log"
     "os"
 
-    mySql "github.com/agent-e11/htmx_go/sql"
+    "github.com/agent-e11/htmx_go/dbcontrol"
     "github.com/brianvoe/gofakeit/v6"
 )
 
@@ -51,10 +51,10 @@ func ConnectDatabase() (*sql.DB, error) {
 }
 
 // Load data from file (encoded as json) into database
-func LoadDummyData(db *sql.DB) []mySql.Product {
-    var products []mySql.Product
+func LoadDummyData(db *sql.DB) []dbcontrol.Product {
+    var products []dbcontrol.Product
     for i := 0; i < 5; i++ {
-        products = append(products, mySql.Product{
+        products = append(products, dbcontrol.Product{
             Name: gofakeit.ProductName(),
             Price: gofakeit.Price(0.0, 200.0),
             Available: gofakeit.Bool(),
@@ -62,7 +62,7 @@ func LoadDummyData(db *sql.DB) []mySql.Product {
     }
 
     for _, p := range products {
-        mySql.InsertProduct(db, p)
+        dbcontrol.InsertProduct(db, p)
     }
 
     return products

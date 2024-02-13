@@ -7,7 +7,7 @@ import (
     "github.com/julienschmidt/httprouter"
 
 	"github.com/agent-e11/htmx_go/handlers"
-	mySql "github.com/agent-e11/htmx_go/sql"
+	"github.com/agent-e11/htmx_go/dbcontrol"
 	"github.com/agent-e11/htmx_go/tools"
 )
 
@@ -25,7 +25,7 @@ func main() {
 
     log.Print("Connected to database...")
 
-    mySql.CreateProductTable(db)
+    dbcontrol.CreateProductTable(db)
 
     // Load dummy data
     //err = tools.LoadDummyData(db, "dummy.json")

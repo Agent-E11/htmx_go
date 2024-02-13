@@ -1,8 +1,8 @@
 package main
 
 import (
-    "github.com/agent-e11/htmx_go/tools"
-    mySql "github.com/agent-e11/htmx_go/sql"
+    _ "github.com/agent-e11/htmx_go/tools"
+    _ "github.com/agent-e11/htmx_go/dbcontrol"
 )
 
 func main() {

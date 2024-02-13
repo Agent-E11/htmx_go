@@ -9,13 +9,13 @@ import (
     "strings"
     "text/template"
 
-    mySql "github.com/agent-e11/htmx_go/sql"
+    "github.com/agent-e11/htmx_go/dbcontrol"
     "github.com/agent-e11/htmx_go/tools"
     "github.com/julienschmidt/httprouter"
 )
 
 type TemplateData struct {
-    Products []mySql.Product
+    Products []dbcontrol.Product
     SearchString string
 }
 
@@ -102,7 +102,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     }
     defer rows.Close()
 
-    products := []mySql.Product{}
+    products := []dbcontrol.Product{}
     var name string
     var price float64
     var available bool
@@ -112,12 +112,12 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         if err != nil {
             log.Printf("Error converting row to product: %v\n", err)
         } else {
-            products = append(products, mySql.Product{ Name: name, Price: price, Available: available })
+            products = append(products, dbcontrol.Product{ Name: name, Price: price, Available: available })
         }
     }
 
     if len(products) > 0 {
-        data := map[string][]mySql.Product{
+        data := map[string][]dbcontrol.Product{
             "Products": products,
         }
 
@@ -162,12 +162,12 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     available := availableStr != ""
 
     // Create product and insert into database
-    product := mySql.Product{
+    product := dbcontrol.Product{
         Name: name,
         Price: price,
         Available: available,
     }
-    mySql.InsertProduct(db, product)
+    dbcontrol.InsertProduct(db, product)
 
     // Return product as html fragment
     tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
