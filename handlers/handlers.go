@@ -62,7 +62,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     search = strings.Replace(search, "_", "\\_", -1)
     search = strings.Replace(search, "*", "%", -1)
 
-    search, queries := parseSearchQuery(search) // FIXME: `queries` is a confusing name
+    search, searchParams := parseSearchQuery(search)
 
     // Initialize the query, whereClause, and conditions
     query := fmt.Sprintf("SELECT name, price, available FROM product")
@@ -77,9 +77,9 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         )
     }
 
-    // If there are other queries, add them as conditions
-    if len(queries) > 0 {
-        for _, col_val := range queries {
+    // If there are other searchParams, add them as conditions
+    if len(searchParams) > 0 {
+        for _, col_val := range searchParams {
             c := fmt.Sprintf("%s::varchar ILIKE '%s'", col_val[0], col_val[1]);
             conditions = append(conditions, c)
             log.Printf("Adding condition: %s", c)
@@ -198,15 +198,15 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
     }
 }
 
-func parseSearchQuery(search string) (returnString string, queries [][2]string) {
-    queries = make([][2]string, 0)
+func parseSearchQuery(search string) (newSearch string, params [][2]string) {
+    params = make([][2]string, 0)
     split := strings.Split(search, " ")
 
     filtered := tools.Filter(split, func(s string) bool {
         return !strings.Contains(s, ":")
     })
 
-    returnString = strings.Join(filtered, " ")
+    newSearch = strings.Join(filtered, " ")
 
     queryStrings := tools.Filter(split, func(s string) bool {
         return strings.Contains(s, ":")
@@ -214,15 +214,15 @@ func parseSearchQuery(search string) (returnString string, queries [][2]string) 
 
     for _, s := range queryStrings {
         key_val := strings.SplitN(s, ":", 2)
-        queries = append(
-            queries,
+        params = append(
+            params,
             [2]string{key_val[0], key_val[1]},
         )
     }
 
     log.Printf("Parsed search string: `%s`", search)
-    log.Printf("Return string: `%s`", returnString)
-    log.Printf("Queries: %v", queries)
+    log.Printf("Return string: `%s`", newSearch)
+    log.Printf("Queries: %v", params)
 
     return
 }
