@@ -22,11 +22,11 @@ type TemplateData struct {
 func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
 
-    search_query := r.URL.Query().Get("q")
+    searchQuery := r.URL.Query().Get("q")
 
     data := TemplateData{
         Products: nil,
-        SearchString: search_query,
+        SearchString: searchQuery,
     }
 
     tmpl.Execute(w, data)
@@ -35,7 +35,7 @@ func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
 
-    no_products_html :=
+    noProductsHtml :=
         `<div id="product-list">
             <p class="mt-5 mx-auto" style="width: max-content">
                 There are no products to display
@@ -64,9 +64,9 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
     search, queries := parseSearchQuery(search) // FIXME: `queries` is a confusing name
 
-    // Initialize the query, where_clause, and conditions
+    // Initialize the query, whereClause, and conditions
     query := fmt.Sprintf("SELECT name, price, available FROM product")
-    where_clause := ""
+    whereClause := ""
     conditions := []string{}
 
     // Add a name condition if the search is not empty
@@ -88,16 +88,16 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
     // If there are conditions, build a where clause from them
     if len(conditions) > 0 {
-        where_clause = " WHERE " + strings.Join(conditions, " AND ")
+        whereClause = " WHERE " + strings.Join(conditions, " AND ")
     }
     // Add the where clause to the query
-    query += where_clause
+    query += whereClause
 
     log.Printf("Querying the database: `%s`", query)
     rows, err := db.Query(query)
     if err != nil {
         log.Printf("Error fetching products with query `%s`: %v", query, err)
-        fmt.Fprint(w, no_products_html)
+        fmt.Fprint(w, noProductsHtml)
         return
     }
     defer rows.Close()
@@ -123,7 +123,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
         tmpl.Execute(w, data)
     } else {
-        fmt.Fprint(w, no_products_html)
+        fmt.Fprint(w, noProductsHtml)
     }
 }
 
@@ -198,7 +198,7 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
     }
 }
 
-func parseSearchQuery(search string) (return_string string, queries [][2]string) {
+func parseSearchQuery(search string) (returnString string, queries [][2]string) {
     queries = make([][2]string, 0)
     split := strings.Split(search, " ")
 
@@ -206,13 +206,13 @@ func parseSearchQuery(search string) (return_string string, queries [][2]string)
         return !strings.Contains(s, ":")
     })
 
-    return_string = strings.Join(filtered, " ")
+    returnString = strings.Join(filtered, " ")
 
-    query_strings := tools.Filter(split, func(s string) bool {
+    queryStrings := tools.Filter(split, func(s string) bool {
         return strings.Contains(s, ":")
     })
 
-    for _, s := range query_strings {
+    for _, s := range queryStrings {
         key_val := strings.SplitN(s, ":", 2)
         queries = append(
             queries,
@@ -221,7 +221,7 @@ func parseSearchQuery(search string) (return_string string, queries [][2]string)
     }
 
     log.Printf("Parsed search string: `%s`", search)
-    log.Printf("Return string: `%s`", return_string)
+    log.Printf("Return string: `%s`", returnString)
     log.Printf("Queries: %v", queries)
 
     return
