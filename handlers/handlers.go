@@ -1,17 +1,17 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
-	"text/template"
+    "fmt"
+    "log"
+    "net/http"
+    "net/url"
+    "strconv"
+    "strings"
+    "text/template"
 
-	mySql "github.com/agent-e11/htmx_go/sql"
-	"github.com/agent-e11/htmx_go/tools"
-	"github.com/julienschmidt/httprouter"
+    mySql "github.com/agent-e11/htmx_go/sql"
+    "github.com/agent-e11/htmx_go/tools"
+    "github.com/julienschmidt/httprouter"
 )
 
 type TemplateData struct {
@@ -170,7 +170,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     mySql.InsertProduct(db, product)
 
     // Return product as html fragment
-    tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
+    tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
     tmpl.ExecuteTemplate(w,
         "product-list-element",
         product,
@@ -182,11 +182,15 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
     defer db.Close()
 
     if err != nil {
+        log.Printf("Error connecting to db: %v", err)
         return
     }
-    products, err := tools.LoadDummyData(db, "dummy.json")
-    tmpl := template.Must(template.ParseFiles("index.tmpl.html"))
-    for _, p := range products {
+    products := tools.LoadDummyData(db)
+    log.Printf("Random products: %v", products)
+
+    tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
+    for i, p := range products {
+        log.Printf("Product %d: %v", i, p)
         tmpl.ExecuteTemplate(w,
             "product-list-element",
             p,

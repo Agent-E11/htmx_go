@@ -1,14 +1,14 @@
 package tools
 
 import (
-	"database/sql"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"log"
-	"os"
+    "database/sql"
+    "errors"
+    "fmt"
+    "log"
+    "os"
 
-	mySql "github.com/agent-e11/htmx_go/sql"
+    mySql "github.com/agent-e11/htmx_go/sql"
+    "github.com/brianvoe/gofakeit/v6"
 )
 
 // Connect to the database
@@ -51,26 +51,21 @@ func ConnectDatabase() (*sql.DB, error) {
 }
 
 // Load data from file (encoded as json) into database
-func LoadDummyData(db *sql.DB, filename string) ([]mySql.Product, error) {
-    bytes, err := os.ReadFile(filename)
-    if err != nil {
-        return nil, err
-    }
-
-    productJson := string(bytes)
-
+func LoadDummyData(db *sql.DB) []mySql.Product {
     var products []mySql.Product
-
-    err = json.Unmarshal([]byte(productJson), &products)
-    if err != nil {
-        return nil, err
+    for i := 0; i < 5; i++ {
+        products = append(products, mySql.Product{
+            Name: gofakeit.ProductName(),
+            Price: gofakeit.Price(0.0, 200.0),
+            Available: gofakeit.Bool(),
+        })
     }
 
     for _, p := range products {
         mySql.InsertProduct(db, p)
     }
 
-    return products, nil
+    return products
 }
 
 func Filter[T any](slice []T, test func(T) bool) []T {
