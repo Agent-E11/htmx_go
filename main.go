@@ -8,11 +8,10 @@ import (
 
 	"github.com/agent-e11/htmx_go/handlers"
 	"github.com/agent-e11/htmx_go/dbcontrol"
-	"github.com/agent-e11/htmx_go/tools"
 )
 
 func main() {
-    db, err := tools.ConnectDatabase()
+    db, err := dbcontrol.ConnectDatabase()
     defer db.Close()
 
     if err != nil {

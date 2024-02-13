@@ -42,7 +42,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
             </p>
         </div>`
 
-    db, err := tools.ConnectDatabase()
+    db, err := dbcontrol.ConnectDatabase()
     if err != nil {
         log.Printf("Error connecting to db: %v", err)
         return
@@ -130,7 +130,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 // Add a product to the database
 func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     // Connect to database
-    db, err := tools.ConnectDatabase()
+    db, err := dbcontrol.ConnectDatabase()
     defer db.Close()
     if err != nil {
         log.Println("Error connecting to database")
@@ -178,7 +178,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-    db, err := tools.ConnectDatabase()
+    db, err := dbcontrol.ConnectDatabase()
     defer db.Close()
 
     if err != nil {
