@@ -21,7 +21,9 @@
                 name="search" placeholder="Filter products..."
                 value="{{ .SearchString }}"
                 hx-post="/product-list"
-                hx-trigger="input changed delay:500ms, search, load"
+                hx-trigger="input changed delay:500ms, search, load,
+                    click from:#new-product-button,
+                    click from:#load-dummy-data-button"
                 hx-target="#product-list"
                 hx-swap="outerHTML">
 
@@ -48,14 +50,14 @@
                     <input type="checkbox" name="available" id="product-available" class="" checked /> <!-- Add a bootstrap class? -->
                 </div>
 
-                <button type="submit" class="btn btn-primary">
+                <button id="new-product-button" type="submit" class="btn btn-primary">
                     <span class="spinner-border spinner-border-sm htmx-indicator" id="spinner" role="status" aria-hidden="true"></span>
                     Submit
                 </button>
                 <div id="form-error"></div>
             </form>
         </div>
-        <button class="btn btn-primary col-2"
+        <button id="load-dummy-data-button" class="btn btn-primary col-2"
             hx-post="/load-dummy-data/"
             hx-target="#product-list"
             hx-swap="beforeend">
