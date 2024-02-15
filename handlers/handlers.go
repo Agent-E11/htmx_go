@@ -93,6 +93,9 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     // Add the where clause to the query
     query += whereClause
 
+    // Add an order by clause
+    query += " ORDER BY name"
+
     log.Printf("Querying the database: `%s`", query)
     rows, err := db.Query(query)
     if err != nil {
@@ -169,12 +172,8 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     }
     dbcontrol.InsertProduct(db, product)
 
-    // Return product as html fragment
-    tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
-    tmpl.ExecuteTemplate(w,
-        "product-list-element",
-        product,
-    )
+    // Tell the client to re-search the product list
+    w.Header().Add("HX-Trigger", "research-products")
 }
 
 func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -188,14 +187,8 @@ func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
     products := tools.LoadDummyData(db)
     log.Printf("Random products: %v", products)
 
-    tmpl := template.Must(template.ParseFiles("product-list.tmpl.html"))
-    for i, p := range products {
-        log.Printf("Product %d: %v", i, p)
-        tmpl.ExecuteTemplate(w,
-            "product-list-element",
-            p,
-        )
-    }
+    // Tell the client to re-search the product list
+    w.Header().Add("HX-Trigger", "research-products")
 }
 
 func parseSearchQuery(search string) (newSearch string, params [][2]string) {

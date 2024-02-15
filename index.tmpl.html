@@ -22,8 +22,7 @@
                 value="{{ .SearchString }}"
                 hx-post="/product-list"
                 hx-trigger="input changed delay:500ms, search, load,
-                    click from:#new-product-button,
-                    click from:#load-dummy-data-button"
+                    research-products from:body"
                 hx-target="#product-list"
                 hx-swap="outerHTML">
 
