@@ -47,6 +47,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         log.Printf("Error connecting to db: %v", err)
         return
     }
+    defer db.Close()
     log.Print("Successfully connected to db")
 
     // Get search value
@@ -135,6 +136,7 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     // Connect to database
     db, err := dbcontrol.ConnectDatabase()
     defer db.Close()
+
     if err != nil {
         log.Println("Error connecting to database")
         return
