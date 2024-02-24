@@ -212,6 +212,37 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     })
 }
 
+func DeleteById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    db, err := dbcontrol.ConnectDatabase()
+    if err != nil {
+        log.Printf("Error connecting to db: %v", err)
+        return
+    }
+    defer db.Close()
+
+    id, err := strconv.Atoi(ps.ByName("id"))
+    if err != nil {
+        log.Printf("Error parsing id")
+        return
+    }
+    
+    //query := fmt.Sprintf("SELECT name FROM product WHERE id = %d", id)
+    query := fmt.Sprintf("DELETE FROM product WHERE id = %d", id)
+    log.Printf("Deleting product with id `%d` with query: %s", id, query)
+
+    rows, err := db.Query(query)
+    if err != nil {
+        fmt.Printf("Error reading rows: %v", err)
+        return
+    }
+
+    var name string
+    for rows.Next() {
+        rows.Scan(&name)
+        log.Printf("Name: %s", name)
+    }
+}
+
 func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     db, err := dbcontrol.ConnectDatabase()
     if err != nil {
