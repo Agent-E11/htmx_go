@@ -35,7 +35,7 @@ func main() {
     router.POST("/add-product/", handlers.AddProduct)
     router.POST("/load-dummy-data/", handlers.LoadDummyDataHandler)
     router.POST("/product-list/", handlers.ProductList)
-    router.DELETE("/delete-by-id/:id", handlers.DeleteById) // TODO: This should be a DELETE request
+    router.DELETE("/delete-by-id/:id", handlers.DeleteById)
     //router.GET("/delete-all-data/", deleteAllDataHandler)
 
     log.Fatal(http.ListenAndServe(":8000", router))

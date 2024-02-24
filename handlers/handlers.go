@@ -121,7 +121,15 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         if err != nil {
             log.Printf("Error converting row to product: %v\n", err)
         } else {
-            products = append(products, dbcontrol.Product{ Id: id, Name: name, Price: price, Available: available })
+            products = append(
+                products,
+                dbcontrol.Product{
+                    Id: id,
+                    Name: name,
+                    Price: price,
+                    Available: available,
+                },
+            )
         }
     }
 

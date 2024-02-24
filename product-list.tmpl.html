@@ -1,15 +1,20 @@
-<ul id="product-list" class="list-group fs-5 mt-3 mx-3">
-    {{ range .Products }}
-        {{ block "product-list-element" . }}
-        <li class="list-group-item bg-primary {{ if not .Available }}opacity-75{{ end }} text-white ">
-            {{ .Name }}: ${{ .Price }}
-            <button class="btn"
-                hx-delete="/delete-by-id/{{ .Id }}"
-                hx-target="#delete-response"
-                hx-swap="innerHTML">
-                <i class="bi bi-x"></i>
-            </button>
-        </li>
+<table id="product-list" class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">Available</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Products }}
+            {{ block "xproduct-list-element" . }}
+            <tr class="{{ if not .Available }}opacity-75{{ end }} text-white ">
+                <td>{{ .Name }}</td>
+                <td>{{ .Price }}</td>
+                <td>{{ .Available }}</td>
+            </tr>
+            {{ end }}
         {{ end }}
-    {{ end }}
-</ul>
+    </tbody>
+</table>
