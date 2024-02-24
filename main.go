@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
-	"net/http"
+    "log"
+    "net/http"
 
     "github.com/julienschmidt/httprouter"
 
-	"github.com/agent-e11/htmx_go/handlers"
-	"github.com/agent-e11/htmx_go/dbcontrol"
+    "github.com/agent-e11/htmx_go/handlers"
+    "github.com/agent-e11/htmx_go/dbcontrol"
 )
 
 func main() {
@@ -25,12 +25,6 @@ func main() {
     log.Print("Connected to database...")
 
     dbcontrol.CreateProductTable(db)
-
-    // Load dummy data
-    //err = tools.LoadDummyData(db, "dummy.json")
-    //if err != nil {
-    //    log.Fatalf("Error loading dummy data: %v\n", err)
-    //}
 
     // HTTP Server
     log.Print("Running htmx server...")

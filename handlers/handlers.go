@@ -1,6 +1,7 @@
 package handlers
 
 import (
+    "errors"
     "fmt"
     "log"
     "net/http"
@@ -95,7 +96,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     query += whereClause
 
     // Add an order by clause
-    query += " ORDER BY name"
+    query += " ORDER BY name, price"
 
     log.Printf("Querying the database: `%s`", query)
     rows, err := db.Query(query)
@@ -133,59 +134,86 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 // Add a product to the database
 func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+    tmpl := template.Must(template.ParseFiles("form.tmpl.html"))
     // Connect to database
     db, err := dbcontrol.ConnectDatabase()
-    defer db.Close()
-
     if err != nil {
         log.Println("Error connecting to database")
         return
     }
+    defer db.Close()
 
     // Get values from form
     name := r.PostFormValue("name")
     priceStr := r.PostFormValue("price")
     availableStr := r.PostFormValue("available")
 
-    if name == "" || priceStr == "" {
+    var nameErr error
+    if name == "" {
+        nameErr = errors.New("Name field cannot be empty")
         log.Println("Error: cannot parse empty fields")
-        w.Header().Add("HX-Retarget", "#form-error")
-        w.Header().Add("HX-Reswap", "innerHTML")
-        fmt.Fprint(w, "No form fields can be empty")
-        return
     }
-
-    // Convert to data types
-    price, err := strconv.ParseFloat(priceStr, 64)
-    if err != nil {
-        log.Printf("Error parsing price: %v\n", err)
-        w.Header().Add("HX-Retarget", "#form-error")
-        w.Header().Add("HX-Reswap", "innerHTML")
-        fmt.Fprintf(w, "`%s` is not a valid number", priceStr)
-        return
+    var priceErr error
+    var price float64
+    if priceStr == "" {
+        priceErr = errors.New("Price field cannot be empty")
+        log.Println("Error: cannot parse empty fields")
+    } else {
+        // Convert to data types
+        price, priceErr = strconv.ParseFloat(priceStr, 64)
+        if priceErr != nil {
+            priceErr = errors.New("Price must be a valid number")
+            log.Printf("Error parsing price: %v\n", err)
+        }
     }
+    
+    // If the string is not "", then the product is available
     available := availableStr != ""
 
-    // Create product and insert into database
-    product := dbcontrol.Product{
-        Name: name,
-        Price: price,
-        Available: available,
-    }
-    dbcontrol.InsertProduct(db, product)
+    log.Println("name:", name)
+    log.Println("priceStr:", priceStr)
+    log.Println("availableStr:", availableStr)
+    log.Println("nameErr:", nameErr)
+    log.Println("price:", price)
+    log.Println("priceErr:", priceErr)
+    log.Println("available:", available)
 
-    // Tell the client to re-search the product list
-    w.Header().Add("HX-Trigger", "research-products")
+    // Create product and insert into database
+    if priceErr == nil && nameErr == nil {
+        product := dbcontrol.Product{
+            Name: name,
+            Price: price,
+            Available: available,
+        }
+        dbcontrol.InsertProduct(db, product)
+
+        // Tell the client to re-search the product list
+        w.Header().Add("HX-Trigger", "research-products")
+    }
+
+    tmpl.Execute(w, struct{
+        Name string
+        NameErr error
+        Price float64
+        PriceErr error
+        Available bool
+    }{
+        Name: name,
+        NameErr: nameErr,
+        Price: price,
+        PriceErr: priceErr,
+        Available: available,
+    })
 }
 
 func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     db, err := dbcontrol.ConnectDatabase()
-    defer db.Close()
-
     if err != nil {
         log.Printf("Error connecting to db: %v", err)
         return
     }
+    defer db.Close()
+
     products := tools.LoadDummyData(db)
     log.Printf("Random products: %v", products)
 

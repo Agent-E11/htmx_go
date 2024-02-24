@@ -40,30 +40,10 @@
 
         <div class="col-4">
             <h1 class="mb-4">Add Product</h1>
-
-            <form hx-post="/add-product/"
-                hx-target="#product-list"
-                hx-swap="beforeend"
-                hx-indicator="#spinner">
-                <div class="mb-4">
-                    <label for="product-name">Name</label>
-                    <input type="text" name="name" id="product-name" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label for="product-price">Price</label>
-                    <input type="number" name="price" id="product-price" min="0" max="9999.99" step="0.01" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label for="product-available">Product is available:</label>
-                    <input type="checkbox" name="available" id="product-available" class="" checked /> <!-- Add a bootstrap class? -->
-                </div>
-
-                <button id="new-product-button" type="submit" class="btn btn-primary">
-                    <span class="spinner-border spinner-border-sm htmx-indicator" id="spinner" role="status" aria-hidden="true"></span>
-                    Submit
-                </button>
-                <div id="form-error"></div>
-            </form>
+            <div hx-post="/add-product/"
+                hx-trigger="load">
+                <!-- Replace with form on load -->
+            </div>
         </div>
         <button id="load-dummy-data-button" class="btn btn-primary col-2"
             hx-post="/load-dummy-data/"
