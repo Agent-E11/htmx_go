@@ -51,6 +51,15 @@
             hx-swap="beforeend">
             Load dummy data
         </button>
+        <div>
+            <button class="btn btn-danger col-2"
+                hx-delete="/delete-by-id/1"
+                hx-target="#delete-response"
+                hx-swap="innerHTML">
+                Delete product
+            </button>
+            <div id="delete-response"></div>
+        </div>
     </div>
 </body>
 </html>

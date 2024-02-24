@@ -216,6 +216,7 @@ func DeleteById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     db, err := dbcontrol.ConnectDatabase()
     if err != nil {
         log.Printf("Error connecting to db: %v", err)
+        fmt.Fprintf(w, "Error connecting to db: %v", err)
         return
     }
     defer db.Close()
@@ -223,24 +224,17 @@ func DeleteById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     id, err := strconv.Atoi(ps.ByName("id"))
     if err != nil {
         log.Printf("Error parsing id")
+        fmt.Fprintln(w, "Error parsing id")
         return
     }
     
-    //query := fmt.Sprintf("SELECT name FROM product WHERE id = %d", id)
     query := fmt.Sprintf("DELETE FROM product WHERE id = %d", id)
     log.Printf("Deleting product with id `%d` with query: %s", id, query)
 
-    rows, err := db.Query(query)
-    if err != nil {
-        fmt.Printf("Error reading rows: %v", err)
-        return
-    }
+    res, err := db.Exec(query)
 
-    var name string
-    for rows.Next() {
-        rows.Scan(&name)
-        log.Printf("Name: %s", name)
-    }
+    w.Header().Add("HX-Trigger", "research-products")
+    fmt.Fprintf(w, "Id: %d<br>Query: %s<br>Result: %v", id, query, res)
 }
 
 func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
