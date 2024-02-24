@@ -12,6 +12,7 @@ import (
 )
 
 type Product struct {
+    Id uint
     Name string
     Price float64
     Available bool

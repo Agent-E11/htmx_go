@@ -70,7 +70,7 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     search, searchParams := parseSearchQuery(search)
 
     // Initialize the query, whereClause, and conditions
-    query := fmt.Sprintf("SELECT name, price, available FROM product")
+    query := fmt.Sprintf("SELECT id, name, price, available FROM product")
     whereClause := ""
     conditions := []string{}
 
@@ -111,16 +111,17 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     defer rows.Close()
 
     products := []dbcontrol.Product{}
+    var id uint
     var name string
     var price float64
     var available bool
 
     for rows.Next() {
-        err := rows.Scan(&name, &price, &available)
+        err := rows.Scan(&id, &name, &price, &available)
         if err != nil {
             log.Printf("Error converting row to product: %v\n", err)
         } else {
-            products = append(products, dbcontrol.Product{ Name: name, Price: price, Available: available })
+            products = append(products, dbcontrol.Product{ Id: id, Name: name, Price: price, Available: available })
         }
     }
 

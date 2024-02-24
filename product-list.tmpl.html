@@ -3,6 +3,12 @@
         {{ block "product-list-element" . }}
         <li class="list-group-item bg-primary {{ if not .Available }}opacity-75{{ end }} text-white ">
             {{ .Name }}: ${{ .Price }}
+            <button class="btn"
+                hx-delete="/delete-by-id/{{ .Id }}"
+                hx-target="#delete-response"
+                hx-swap="innerHTML">
+                <i class="bi bi-x"></i>
+            </button>
         </li>
         {{ end }}
     {{ end }}
