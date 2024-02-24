@@ -59,6 +59,9 @@ func ProductList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
         w.Header().Add("HX-Replace-URL", "/")
     }
 
+    // Trim whitespace and collapse multiple spaces
+    search = strings.Join(strings.Fields(search), " ")
+
     // Escape characters and use `*` instead of `%`
     search = strings.Replace(search, "%", "\\%", -1)
     search = strings.Replace(search, "_", "\\_", -1)
@@ -147,6 +150,9 @@ func AddProduct(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
     name := r.PostFormValue("name")
     priceStr := r.PostFormValue("price")
     availableStr := r.PostFormValue("available")
+
+    // Trim whitespace and collapse multiple spaces
+    name = strings.Join(strings.Fields(name), " ")
 
     var nameErr error
     if name == "" {
