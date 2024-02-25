@@ -36,16 +36,7 @@ func main() {
     router.POST("/load-dummy-data/", handlers.LoadDummyDataHandler)
     router.POST("/product-list/", handlers.ProductList)
     router.DELETE("/delete-by-id/:id", handlers.DeleteById)
-    //router.GET("/delete-all-data/", deleteAllDataHandler)
+    router.DELETE("/delete-all-data/", handlers.DeleteAllData)
 
     log.Fatal(http.ListenAndServe(":8000", router))
 }
-
-//func deleteAllDataHandler(w http.ResponseWriter, r *http.Request) {
-//    db, err := tools.ConnectDatabase()
-//    defer db.Close()
-//
-//    if err != nil {
-//        return
-//    }
-//}

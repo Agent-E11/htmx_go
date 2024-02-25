@@ -240,10 +240,25 @@ func DeleteById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     query := fmt.Sprintf("DELETE FROM product WHERE id = %d", id)
     log.Printf("Deleting product with id `%d` with query: %s", id, query)
 
-    res, err := db.Exec(query)
+    _, err = db.Exec(query)
 
     w.Header().Add("HX-Trigger", "research-products")
-    fmt.Fprintf(w, "Id: %d<br>Query: %s<br>Result: %v", id, query, res)
+}
+
+func DeleteAllData(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+    db, err := dbcontrol.ConnectDatabase()
+    if err != nil {
+        log.Printf("Error connecting to db: %v", err)
+        return
+    }
+    defer db.Close()
+
+    query := "DELETE FROM product"
+    log.Println("Deleting all data from database")
+
+    _, err = db.Exec(query)
+
+    w.Header().Add("HX-Trigger", "research-products")
 }
 
 func LoadDummyDataHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

@@ -7,7 +7,7 @@ import (
     "github.com/brianvoe/gofakeit/v6"
 )
 
-// Load data from file (encoded as json) into database
+// Generate 5 random products using gofakit
 func LoadDummyData(db *sql.DB) []dbcontrol.Product {
     var products []dbcontrol.Product
 
