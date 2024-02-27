@@ -9,7 +9,9 @@
             id="product-name"
             class="form-control {{ if .NameErr }}is-invalid{{ end }}"
             value="{{ .Name }}"/>
-        <div class="invalid-feedback">{{ if .NameErr }}{{ .NameErr.Error }}{{ end }}</div>
+        <div class="invalid-feedback">
+            {{ if .NameErr }}{{ .NameErr.Error }}{{ end }}
+        </div>
     </div>
 
     <div class="mb-3">
@@ -24,16 +26,16 @@
                     is-invalid
                 {{ end }}"
                 value="{{ if not .PriceErr }}{{ .Price }}{{ end }}"/>
-        <div class="invalid-feedback">{{ if .PriceErr }}{{ .PriceErr.Error }}{{ end }}</div>
+        <div class="invalid-feedback">
+            {{ if .PriceErr }}{{ .PriceErr.Error }}{{ end }}
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="product-available">Product is available:</label>
-        <!-- TODO: Add a bootstrap class? -->
-        <input type="checkbox" name="available" id="product-available" class="" {{ if .Available }}checked{{ end }}/>
+    <div class="form-check mb-3">
+        <input type="checkbox" name="available" id="product-available" class="form-check-input" {{ if .Available }}checked{{ end }}/>
+        <label class="form-check-label" for="product-available">Product is available</label>
     </div>
     <button id="new-product-button" type="submit" class="btn btn-primary">
         <span class="spinner-border spinner-border-sm htmx-indicator" id="spinner" role="status" aria-hidden="true"></span>
         Submit
     </button>
-    <div id="form-error"></div>
 </form>
